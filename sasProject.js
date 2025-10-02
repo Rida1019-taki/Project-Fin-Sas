@@ -20,7 +20,7 @@ let livres = [
     titre: "getit Prince", 
     auteur: "Exupéry", 
     annee: 1955, 
-    dispo: true 
+    dispo: false 
   },
 ];
 
@@ -37,20 +37,23 @@ let emprunts = [];
 function menu() {
   console.log(`
     -----------------------------------------------Ajouter plusieur livres-------------------------------------------------
-1. =========> Ajouter livre
+ 1. ========> Ajouter livre
     -----------------------------------------------Operation sur les livres------------------------------------------------
-2. =========> Afficher livres
-3. =========> Trier livres (asc / desc)
-4. =========> Trier livres (annee)
-5. =========> Afficher uniquement les livres disponible
-6. =========> Rechercher livres(ISBN)
+ 2. =========> Afficher livres
+ 3. =========> Trier livres (asc / desc)
+ 4. =========> Trier livres (annee)
+ 5. =========> Afficher uniquement les livres disponible
+ 6. =========> Rechercher livres(ISBN)
     -----------------------------------------------Gestion des abonnes-----------------------------------------------------
-7. =========> Ajouter abonné
-8. =========> Afficher abonnés
+ 7. =========> Ajouter abonné
+                                                   -------------------
+ 8. =========> Afficher abonnés
     -----------------------------------------------Gestion des emprunts----------------------------------------------------
-9. =========> Emprunter livre
-10. =========> Retourner livre
-11. =========> Quitter
+ 9. =========> Emprunter livre
+                                                   -------------------
+ 10. =========> Retourner livre
+ 11. =========> Afficher les livres empruntés par un abonné donné
+ 12. =========> Quitter
 `);
   return prompt("Choix: ");
 }
@@ -58,8 +61,7 @@ let res ;
 while (true) {
   switch (menu()) {
     case "1":
-      res = AjouterLivres();
-      console.log(res);
+       AjouterLivres();
       break;
 
     case "2":
@@ -93,6 +95,7 @@ while (true) {
 
     case "5":
        AfficherUniquementLesLivresDisponible(); 
+       
        break;
 
     case "6": 
@@ -110,14 +113,18 @@ while (true) {
       break;
 
     case "9":
-      res = EmprunterLivre();
-      console.log(res);
+      EmprunterLivre();
       break;
 
     case "10":
-      
+      RetournerLivre();
+      break;
       
     case "11":
+      AfficherLivresEmpruntesParAbonne();
+      break;
+
+    case "12":
       console.log("Bye");
       process.exit();
       break;
@@ -128,23 +135,26 @@ while (true) {
   };
 
   function AfficherLivres(){
+    console.log(`
+╔════════════════════════════════════════════╗
+║           📚 LISTE DES LIVRES 📚            ║
+╚════════════════════════════════════════════╝
+  `);
     for (let i in livres){
-        console.log(livres[i].isbn);
-        console.log(livres[i].titre);
-        console.log(livres[i].auteur);
-        console.log(livres[i].annee); 
-        console.log(livres[i].dispo); 
+        return livres;
     };
-    return livres;
+    
   };
   function AfficherAbonne(){
+    console.log(`
+╔════════════════════════════════════════════╗
+║           📚 LISTE DES Abonnes 📚            ║
+╚════════════════════════════════════════════╝
+  `);
     for (let i in abonnes){
-        console.log(abonnes[i].id);
-        console.log(abonnes[i].nom);
-        console.log(abonnes[i].prenom);
-        console.log(abonnes[i].email);  
+        return abonnes;
     };
-    return abonnes;
+    
   };
   function AjouterLivres(){
     let Isbn = prompt("Entrer ISBN : ");
@@ -171,49 +181,78 @@ while (true) {
     return abonnes;
   };
   function RechercherLivre() {
-  let isbnCherche = prompt("Donner ISBN du livre : "); 
-  let res = null;
-
-  for (let livre of livres) {   
-    if (livre.isbn === isbnCherche) {  
-      res = livre;                     
-      break;                           
+    let isbnCherche = prompt("Donner ISBN du livre : "); 
+    let res;
+    for (let livre of livres) {   
+      if (livre.isbn === isbnCherche) {  
+        res = livre;                     
+        break;                           
+      }
     }
-  }
-  if (res) {
-    console.log(" Livre trouvé :", res);
-    return res;   
-  } else {
-    console.log(" Aucun livre avec cet ISBN.");
-  }
-  }
+    if (res) {
+      console.log(" Livre trouve :", res);
+      return res;   
+    } else {
+      console.log(" Aucun livre avec cet ISBN.");
+    }
+  };
   function AfficherUniquementLesLivresDisponible(){
-  let ArryDisponible =[];
-  let ArryNomDisponible =[];
-    for (let i in livres){
-        if(livres[i].dispo){
-            ArryDisponible.push(livres[i]);
-        }else{
-            ArryNomDisponible.push(livres[i]);
-        }
-    }
-    console.log(ArryDisponible);
-    console.log(ArryNomDisponible);
-    return ArryDisponible;
+    let ArryDisponible =[];
+    let ArryNomDisponible =[];
+      for (let i in livres){
+          if(livres[i].dispo === true){
+              ArryDisponible.push(livres[i]);
+          }else{
+              ArryNomDisponible.push(livres[i]);
+          }
+      }
+      console.log(ArryDisponible);
+      console.log(ArryNomDisponible);
+      return ;
 
-  } 
+  }; 
   function EmprunterLivre() {
-  let id = Number(prompt("ID abonne : "));
-  let abonne = abonnes.find(a => a.id === id);
-  if (!abonne) return console.log("Abonné introuvable");
+    let id = Number(prompt("ID abonne : "));
+    let abonne = abonnes.find(a => a.id === id);
+      if (!abonne) {
+        return console.log("Abonné introuvable");
+      };
+    let isbn = prompt("ISBN livre: ");
+    let livre = livres.find(l => l.isbn === isbn && l.dispo);
+      if (!livre){ 
+        return console.log("Livre non disponible");
+      }
+    let date = new Date().toISOString().slice(0, 10); 
+    emprunts.push({ abonneId: id, isbn, dateEmprunt: date });
+    livre.dispo = false;
 
-  let isbn = prompt("ISBN livre: ");
-  let livre = livres.find(l => l.isbn === isbn && l.dispo);
-  if (!livre) return console.log("Livre non disponible");
+    console.log("Emprunt enregistré avec succès");
+    console.log(emprunts);
+    
+  };
+  function RetournerLivre() {
+    let id = Number(prompt("id abonne : "));
+    let isbnRetoune = prompt("ISBN livre à retourner : ");
 
-  emprunts.push({ abonneId: id, isbn });
-  livre.dispo = false;
-  console.log("Emprunt sauvgarder");
-  }
+    let emprunt = emprunts.find(e => e.abonneId === id && e.isbn === isbnRetoune);
+    if (!emprunt) {
+       console.log("Pas d'emprunt trouvé pour cet abonné et ce livre");
+       return ;
+    }
+    let livre = livres.find(l => l.isbn === isbnRetoune);
+    if (livre) {
+      livre.dispo = true;
+    };
+    emprunts = emprunts.filter(e => !(e.abonneId === id && e.isbn === isbnRetoune));
+
+    console.log("Livre retourne avec succes");
+  };
   
+  function AfficherLivresEmpruntesParAbonne() {
+    for (let livre of livres) {
+      if (livre.dispo) {
+        console.log("Titre :", livre.titre, "| ISBN :", livre.isbn);
+      }
+    }
+  };
 }
