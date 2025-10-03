@@ -48,11 +48,7 @@ function menu() {
  7. =========> Ajouter abonné
                                                    -------------------
  8. =========> Afficher abonnés
-    -----------------------------------------------Gestion des emprunts----------------------------------------------------
- 9. =========> Emprunter livre
-                                                   -------------------
- 10. =========> Retourner livre
- 11. =========> Afficher les livres empruntés par un abonné donné
+ 
  12. =========> Quitter
 `);
   return prompt("Choix: ");
@@ -111,20 +107,12 @@ while (true) {
       res = AfficherAbonne();
       console.log(res);
       break;
+    case "10":
+      res = cc();
+      console.log(res);
+      break;
 
     case "9":
-      EmprunterLivre();
-      break;
-
-    case "10":
-      RetournerLivre();
-      break;
-      
-    case "11":
-      AfficherLivresEmpruntesParAbonne();
-      break;
-
-    case "12":
       console.log("Bye");
       process.exit();
       break;
@@ -211,48 +199,5 @@ while (true) {
       return ;
 
   }; 
-  function EmprunterLivre() {
-    let id = Number(prompt("ID abonne : "));
-    let abonne = abonnes.find(a => a.id === id);
-      if (!abonne) {
-        return console.log("Abonné introuvable");
-      };
-    let isbn = prompt("ISBN livre: ");
-    let livre = livres.find(l => l.isbn === isbn && l.dispo);
-      if (!livre){ 
-        return console.log("Livre non disponible");
-      }
-    let date = new Date().toISOString().slice(0, 10); 
-    emprunts.push({ abonneId: id, isbn, dateEmprunt: date });
-    livre.dispo = false;
-
-    console.log("Emprunt enregistré avec succès");
-    console.log(emprunts);
-    
-  };
-  function RetournerLivre() {
-    let id = Number(prompt("id abonne : "));
-    let isbnRetoune = prompt("ISBN livre à retourner : ");
-
-    let emprunt = emprunts.find(e => e.abonneId === id && e.isbn === isbnRetoune);
-    if (!emprunt) {
-       console.log("Pas d'emprunt trouvé pour cet abonné et ce livre");
-       return ;
-    }
-    let livre = livres.find(l => l.isbn === isbnRetoune);
-    if (livre) {
-      livre.dispo = true;
-    };
-    emprunts = emprunts.filter(e => !(e.abonneId === id && e.isbn === isbnRetoune));
-
-    console.log("Livre retourne avec succes");
-  };
   
-  function AfficherLivresEmpruntesParAbonne() {
-    for (let livre of livres) {
-      if (livre.dispo) {
-        console.log("Titre :", livre.titre, "| ISBN :", livre.isbn);
-      }
-    }
-  };
 }
